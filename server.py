@@ -15,7 +15,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 
-from config import Settings
+from settings import Settings
 from filter import TopicFilter
 from scout import TopicScout
 from topic_pool import TopicPool
