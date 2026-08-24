@@ -32,19 +32,17 @@ class Settings:
     scout_interval_minutes: int
     scout_on_startup: bool
     scout_startup_delay_seconds: int
-
     topic_ttl_hours: int
     max_topics_per_run: int
     candidates_per_source: int
-
     scout_sources: list[str]
     scout_categories: list[str]
     scout_categories_per_run: int
+    scout_pinned_categories: list[str]
 
     google_news_lang: str
     google_news_country: str
     google_news_edition: str
-
     github_token: str | None
     user_agent: str
 
@@ -73,10 +71,7 @@ class Settings:
         db_path = Path(
             os.getenv(
                 "DB_PATH",
-                str(
-                    data_dir
-                    / "topic_pool.sqlite3"
-                ),
+                str(data_dir / "topic_pool.sqlite3"),
             )
         ).expanduser()
 
@@ -102,7 +97,10 @@ class Settings:
         )
 
         provider = (
-            os.getenv("LLM_PROVIDER", "")
+            os.getenv(
+                "LLM_PROVIDER",
+                "",
+            )
             .strip()
             .lower()
         )
@@ -176,10 +174,10 @@ class Settings:
             max_topics_per_run=max(
                 1,
                 min(
-                    10,
+                    12,
                     _env_int(
                         "MAX_TOPICS_PER_RUN",
-                        3,
+                        8,
                     ),
                 ),
             ),
@@ -190,7 +188,7 @@ class Settings:
                     30,
                     _env_int(
                         "CANDIDATES_PER_SOURCE",
-                        8,
+                        12,
                     ),
                 ),
             ),
@@ -198,6 +196,8 @@ class Settings:
             scout_sources=_env_csv(
                 "SCOUT_SOURCES",
                 (
+                    "baidu_hot,"
+                    "weibo_hot,"
                     "google_news,"
                     "hacker_news,"
                     "arxiv,"
@@ -208,10 +208,19 @@ class Settings:
             scout_categories=_env_csv(
                 "SCOUT_CATEGORIES",
                 (
+                    "trending,"
+                    "society,"
+                    "entertainment,"
+                    "finance,"
+                    "sports,"
+                    "education,"
+                    "health,"
+                    "consumer,"
                     "ai,"
                     "technology,"
                     "science,"
                     "law,"
+                    "domestic,"
                     "world,"
                     "culture,"
                     "weird"
@@ -221,12 +230,17 @@ class Settings:
             scout_categories_per_run=max(
                 1,
                 min(
-                    7,
+                    12,
                     _env_int(
                         "SCOUT_CATEGORIES_PER_RUN",
-                        3,
+                        6,
                     ),
                 ),
+            ),
+
+            scout_pinned_categories=_env_csv(
+                "SCOUT_PINNED_CATEGORIES",
+                "trending,society",
             ),
 
             google_news_lang=os.getenv(
@@ -252,8 +266,12 @@ class Settings:
             user_agent=os.getenv(
                 "SCOUT_USER_AGENT",
                 (
-                    "TopicPoolMCP/1.0 "
-                    "(+personal-news-buffer)"
+                    "Mozilla/5.0 "
+                    "(iPhone; CPU iPhone OS 17_0 like Mac OS X) "
+                    "AppleWebKit/605.1.15 "
+                    "(KHTML, like Gecko) "
+                    "Mobile/15E148 "
+                    "TopicPoolMCP/1.2"
                 ),
             ),
 
@@ -263,9 +281,7 @@ class Settings:
             ),
 
             llm_provider=provider,
-
             llm_api_key=llm_api_key,
-
             llm_base_url=base_url,
 
             filter_model=os.getenv(
@@ -290,10 +306,7 @@ class Settings:
 
             disable_dns_rebinding_protection=(
                 _env_bool(
-                    (
-                        "MCP_DISABLE_"
-                        "DNS_REBINDING_PROTECTION"
-                    ),
+                    "MCP_DISABLE_DNS_REBINDING_PROTECTION",
                     True,
                 )
             ),
