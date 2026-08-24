@@ -6,7 +6,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
-from config import Settings
+from settings import Settings
 
 logger = logging.getLogger(__name__)
 
