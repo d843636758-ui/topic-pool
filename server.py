@@ -91,12 +91,62 @@ def _ctx(ctx: Context[AppContext]) -> AppContext:
     return ctx.request_context.lifespan_context
 
 
-def _consumer(ctx: Context[AppContext], consumer_id: str | None) -> str:
+def _consumer(
+    ctx: Context[AppContext],
+    consumer_id: str | None,
+) -> str:
     if consumer_id and consumer_id.strip():
         return consumer_id.strip()[:80]
-    headers = ctx.request_context.headers or {}
-    value = headers.get("x-topic-consumer") or headers.get("X-Topic-Consumer")
-    return (value.strip()[:80] if value else "chatgpt")
+
+    request_context = getattr(
+        ctx,
+        "request_context",
+        None,
+    )
+
+    headers = getattr(
+        request_context,
+        "headers",
+        None,
+    )
+
+    if headers is None:
+        request = getattr(
+            request_context,
+            "request",
+            None,
+        )
+
+        headers = getattr(
+            request,
+            "headers",
+            None,
+        )
+
+    value = None
+
+    if headers:
+        try:
+            value = (
+                headers.get(
+                    "x-topic-consumer"
+                )
+                or headers.get(
+                    "X-Topic-Consumer"
+                )
+            )
+        except Exception:
+            value = None
+
+    if value:
+        value = str(
+            value
+        ).strip()
+
+        if value:
+            return value[:80]
+
+    return "chatgpt"
 
 
 
