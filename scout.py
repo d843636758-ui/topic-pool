@@ -13,7 +13,7 @@ from urllib.parse import quote_plus
 import feedparser
 import httpx
 
-from config import Settings
+from settings import Settings
 from filter import TopicFilter
 from topic_pool import TopicPool, stable_hash, utc_now_iso
 
